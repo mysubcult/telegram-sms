@@ -194,6 +194,10 @@ def check_activation_status_thread(context: CallbackContext, activation_id: str,
             asyncio.sleep(5)  # Проверяем каждые 5 секунд
         else:
             # Обрабатываем другие возможные статусы (например, ошибка или отмена)
+            if "STATUS_CANCEL" in response.text or "STATUS_ERROR" in response.text:
+                chat_id = context.user_data.get('chat_id')
+                asyncio.run(context.bot.send_message(chat_id=chat_id, text=f"Активация для номера {number} была отменена или произошла ошибка."))
+                break
             asyncio.sleep(5)
 
 # Просмотр текущих заказов
@@ -241,7 +245,7 @@ async def error(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     # Вставьте токен вашего бота, полученный у BotFather
-    application = Application.builder().token("8110647148:AAHupEEVe98sbRfEAi44-qa-n_XfnTvndRc").build()
+    application = Application.builder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
 
     # Определение этапов разговора
     conv_handler = ConversationHandler(
